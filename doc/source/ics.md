@@ -62,6 +62,7 @@ This source has been successfully tested with the following service providers:
 #### Thüringen
 
 - [Abfallwirtschaftsbetrieb Ilm-Kreis](https://aik.ilm-kreis.de/) ([Notes](#abfallwirtschaftsbetrieb-ilm-kreis))
+- [Abfallwirtschaftszweckverband Wartburgkreis - Stadt Eisenach](https://www.azv-wak-ea.de) [Notes](#abfallwirtschaftszweckverband-wartburgkreis---stadt-eisenach)
 
 ### Sweden
 
@@ -855,3 +856,72 @@ waste_collection_schedule:
           referer: "https://aik.ilm-kreis.de"
       calendar_title: Abfuhrtermine Witzleben
 ```
+
+***
+
+### Abfallwirtschaftszweckverband Wartburgkreis - Stadt Eisenach
+
+Go to the [service provider website](https://www.azv-wak-ea.de/abfallkalender.html) and select city/village and street. The selection of desired waste types don't matter, the provided ICS contains all type. Hit the button "Import für Kalender herunterladen" to open a popup, where you can a) download the ics file or b) copy the ics URL for direct integration.
+
+Hints: 
+- Maybe you have to check your ICS-URL in December. Sometimes the URL changes in the next year because of changed catchment areas.
+- The example contains two URLs, one for the city of Eisenach and one for a smaller village in the Wartburgkreis
+
+```yaml
+waste_collection_schedule:
+  sources:
+    - name: ics
+      args:
+        url: https://azv.hausmuell.info/ics/ics.php?egebiet=34432&ort=Wutha-Farnroda&ortsteil=Wutha-Farnroda
+        #url: https://azv.hausmuell.info/ics/ics.php?egebiet=34729&ort=Eisenach&ortsteil=Ortskern&strasse=Goethestra%C3%9Fe
+        
+      customize:
+        - type: Restmüll
+          icon: mdi:trash-can
+        - type: Bioabfall
+          icon: mdi:flower-outline
+        - type: Papier, Pappe, Karton
+          alias: Papier
+          icon: mdi:trash-can-outline
+        - type: Gelbe Tonne
+          icon: mdi:recycle
+
+sensor:
+  - platform: waste_collection_schedule
+    name: Restmüll
+    details_format: upcoming
+    count: 4
+    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+    types:
+      - 'Restmüll'
+
+  - platform: waste_collection_schedule
+    name: Papier
+    details_format: upcoming
+    count: 4
+    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+    types:
+      - 'Papier'
+      - 'Papier, Pappe, Karton'
+
+  - platform: waste_collection_schedule
+    name: Gelbe_Tonne
+    details_format: upcoming
+    count: 4
+    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+    types:
+      - 'Gelbe Tonne'
+
+  - platform: waste_collection_schedule
+    name: Bioabfall
+    details_format: upcoming
+    count: 4
+    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+    types:
+      - 'Bioabfall'
+```
+
